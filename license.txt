@@ -1,0 +1,3 @@
+Snowflake favicon.ico and snowflake.svg
+Copyright (c) 2025 [joypixels; svgrepo.com]
+Licensed under the MIT License.
