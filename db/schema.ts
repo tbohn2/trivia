@@ -5,6 +5,9 @@ export const sessions = pgTable('sessions', {
     hostName: text('host_name').notNull(),
     sessionName: text('session_name').notNull(),
     live: boolean('live').notNull().default(false),
+    presentationId: text('presentation_id'),
+    slideIndex: integer('slide_index').notNull().default(0),
+    slideIds: text('slide_ids').array().notNull().default([]),
 });
 
 export const players = pgTable('players', {
