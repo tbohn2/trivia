@@ -2,22 +2,37 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import RenderSlide, { GoogleSlide } from '@/components/RenderSlide';
 
 interface Session {
     id: string;
     hostName: string;
     sessionName: string;
     live: boolean;
+    presentationId: string;
+    slideIndex: number;
 }
+
+interface Answer {
+    name: string;
+    answer: string;
+}
+
+interface Slide {
+    slideIndex: number;
+    slide: GoogleSlide;
+};
 
 export default function HostPage() {
     const params = useParams();
     const sessionId = params.id as string;
     const [session, setSession] = useState<Session | null>(null);
+    const [answers, setAnswers] = useState<Answer[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isDeleting, setIsDeleting] = useState(false);
     const [error, setError] = useState('');
     const [isUpdating, setIsUpdating] = useState(false);
+    const [currentSlide, setCurrentSlide] = useState<Slide | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -30,6 +45,12 @@ export default function HostPage() {
             fetchSession(sessionId);
         }
     }, [sessionId, router]);
+
+    useEffect(() => {
+        if (session) {
+            fetchCurrentSlide();
+        }
+    }, [session]);
 
     const fetchSession = async (sessionId: string) => {
         try {
@@ -103,10 +124,56 @@ export default function HostPage() {
     };
 
     const fetchAnswers = async () => {
-
+        try {
+            const response = await fetch(`/api/answers/${sessionId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch answers');
+            }
+            const data = await response.json();
+            setAnswers(data);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred');
+        } finally {
+            setIsUpdating(false);
+        }
     };
 
+    const fetchCurrentSlide = async () => {
+        try {
+            const response = await fetch(`/api/currentSlide/${sessionId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch current slide');
+            }
+            const data = await response.json();
+            console.log('data', data);
+            setCurrentSlide(data);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
 
+    const updateCurrentSlide = async (slideIndex: number) => {
+        try {
+            const response = await fetch(`/api/currentSlide/${sessionId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ slideIndex }),
+            });
+            if (!response.ok) {
+                throw new Error('Failed to update current slide');
+            }
+            const data = await response.json();
+            setCurrentSlide(data);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -147,6 +214,41 @@ export default function HostPage() {
                 {error && (
                     <div className="rounded-lg bg-red-50 p-4 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-400">
                         {error}
+                    </div>
+                )}
+
+                {currentSlide && (
+                    <>
+                        <RenderSlide slide={currentSlide.slide} />
+                        <div className="flex items-center justify-center gap-4">
+                            <button
+                                onClick={() => updateCurrentSlide(currentSlide.slideIndex - 1)}
+                                className="button button1 text-2xl"
+                            >
+                                &#8592;
+                            </button>
+                            <button
+                                onClick={() => updateCurrentSlide(currentSlide.slideIndex + 1)}
+                                className="button button1 text-2xl"
+                            >
+                                &#8594;
+                            </button>
+
+                        </div>
+                    </>
+                )}
+
+                {answers.length > 0 && (
+                    <div className="flex flex-col items-center justify-center gap-4">
+                        <h2 className="text-2xl">Answers</h2>
+                        <ul className="list-none">
+                            {answers.map((answer) => (
+                                <li key={answer.name} className="text-2xl atma">
+                                    <span className="border-2 border-tertiary p-2 bg-dark">{answer.name}</span>
+                                    <span className="border-2 border-tertiary p-2 bg-dark">{answer.answer}</span>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 )}
 
