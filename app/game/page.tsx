@@ -1,16 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function GamePage() {
     const [formInputs, setFormInputs] = useState([
-        { label: 'Game ID', name: 'gameId', type: 'text', placeholder: 'Enter Game ID', value: sessionStorage.getItem('gameId') || '' },
+        { label: 'Game ID', name: 'gameId', type: 'text', placeholder: 'Enter Game ID', value: '' },
         { label: 'Player Name', name: 'playerName', type: 'text', placeholder: 'Enter Player Name', value: '' },
     ]);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const storedGameId = sessionStorage.getItem('gameId') || '';
+            if (storedGameId) {
+                setFormInputs(prev =>
+                    prev.map(input =>
+                        input.name === 'gameId' ? { ...input, value: storedGameId } : input
+                    )
+                );
+            }
+        }
+    }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -53,7 +66,7 @@ export default function GamePage() {
     };
 
     return (
-        <main className="atma flex min-h-screen items-center justify-center px-8 py-16">
+        <main className="atma flex items-center justify-center px-8 py-16">
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-2xl bg-tertiary p-8 w-11/12">
                 {formInputs.map((field) => (
                     <div key={field.name} className="flex flex-col gap-2">

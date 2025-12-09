@@ -42,6 +42,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${hennyPenny.variable} ${atma.variable} min-h-screen w-full`}
       >
+        <div className="w-full h-[100px]"></div>
         {children}
       </body>
     </html>

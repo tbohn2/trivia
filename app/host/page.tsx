@@ -65,7 +65,7 @@ export default function Home() {
   };
 
   return (
-    <main className="hennyPenny flex min-h-screen w-full flex-col items-center justify-center">
+    <main className="hennyPenny flex w-full flex-col items-center justify-center">
       <div className="max-w-md rounded-2xl bg-tertiary p-8 w-11/12">
         <h1 className="text-3xl font-bold text-dark text-center">
           Enter Session Details

@@ -177,7 +177,7 @@ export default function HostPage() {
 
     if (isLoading) {
         return (
-            <div className="flex min-h-screen items-center justify-center">
+            <div className="flex items-center justify-center">
                 <p className="hennyPenny text-5xl">Loading session...</p>
             </div>
         );
@@ -185,7 +185,7 @@ export default function HostPage() {
 
     if (!session) {
         return (
-            <div className="atma flex min-h-screen flex-col items-center justify-center gap-4">
+            <div className="atma flex flex-col items-center justify-center gap-4">
                 <p className="text-5xl text-wrap text-center">Session {sessionId} not found</p>
                 <button
                     onClick={() => router.push('/')}
@@ -197,7 +197,7 @@ export default function HostPage() {
     }
 
     return (
-        <main className="flex min-h-screen w-full flex-col items-center justify-center">
+        <main className="flex w-full flex-col items-center justify-center">
             <div className="atma space-y-8 rounded-2xl bg-tertiary p-8 w-11/12">
                 <div className="text-center flex flex-col items-center justify-center gap-4">
                     <h1 className="text-3xl flex flex-wrap justify-center items-center gap-4">
