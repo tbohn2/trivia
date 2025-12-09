@@ -11,6 +11,7 @@ export default function PlayerGamePage() {
     const [error, setError] = useState('');
     const [answer, setAnswer] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submittedAnswer, setSubmittedAnswer] = useState(false);
     const router = useRouter();
     const [isLoaded, setIsLoaded] = useState(false);
 
@@ -35,6 +36,7 @@ export default function PlayerGamePage() {
         e.preventDefault();
         setError('');
         setIsSubmitting(true);
+        setSubmittedAnswer(false);
         try {
             const response = await fetch(`/api/players/${playerId}`, {
                 method: 'PATCH',
@@ -49,31 +51,39 @@ export default function PlayerGamePage() {
             }
             const data = await response.json();
             setAnswer(data.answer);
+            setSubmittedAnswer(true);
         } catch (error) {
             setError(error instanceof Error ? error.message : 'An error occurred');
             setTimeout(() => {
                 setError('');
-            }, 3000);
+            }, 5000);
         } finally {
             setIsSubmitting(false);
         }
     };
 
 
+
+
     return (
-        <main className="atma min-h-screen flex flex-col items-center justify-center gap-12 px-8 py-16">
-            <form onSubmit={handleSubmit} className="w-11/12 flex flex-col items-center justify-center gap-4">
+        <main className="atma flex flex-col items-center justify-center gap-12 px-8 py-16">
+            <form onSubmit={handleSubmit} className="w-11/12 flex flex-col items-center justify-center gap-4 rounded-2xl bg-tertiary p-8">
                 <h1 className="text-4xl hennyPenny text-center">{sessionName}</h1>
                 <label htmlFor="answer" className="text-2xl text-center">Answer Below</label>
-                <textarea id="answer" name="answer" value={answer} onChange={(e) => setAnswer(e.target.value)} className="w-full rounded-lg p-3 text-xl text-dark bg-light placeholder-primary focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary" />
+                {submittedAnswer && (
+                    <div className="hennyPenny w-full rounded-lg bg-green border-2 border-primary text-primary p-4 text-2xl text-center">
+                        Answer Submitted!
+                    </div>
+                )}
+                <textarea id="answer" rows={5} name="answer" value={answer} onChange={(e) => setAnswer(e.target.value)} className="w-full rounded-lg p-2 text-xl text-dark bg-light placeholder-primary focus:outline-none focus:ring-2 focus:ring-primary" />
                 {error && (
-                    <div className="rounded-lg bg-light border-2 border-light p-4 text-xl text-primary">
+                    <div className="w-full rounded-lg bg-light border-2 border-light p-4 text-xl text-primary">
                         {error}
                     </div>
                 )}
                 <button type="submit" disabled={isSubmitting} className="w-full button button1 text-2xl">{isSubmitting ? 'Submitting...' : 'Submit Answer'}</button>
             </form>
-            <button onClick={() => setAnswer('')} className="w-11/12 button button3 text-2xl">Clear Answer</button>
+            <button onClick={() => { setAnswer(''); setSubmittedAnswer(false); }} className="w-11/12 button button3 text-2xl">Clear Answer</button>
         </main>
     );
 }
