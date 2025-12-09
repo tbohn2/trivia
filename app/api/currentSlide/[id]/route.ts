@@ -4,14 +4,28 @@ import { players, sessions } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { google } from "googleapis";
 
-const credentials = JSON.parse(<string>process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
+function getCredentials() {
+    const key = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+    if (!key) {
+        throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY environment variable is not set');
+    }
+    try {
+        return JSON.parse(key);
+    } catch (error) {
+        throw new Error('Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY as JSON');
+    }
+}
 
-const auth = new google.auth.GoogleAuth({
-    credentials,
-    scopes: ["https://www.googleapis.com/auth/presentations.readonly"]
-});
+function getAuth() {
+    const credentials = getCredentials();
+    return new google.auth.GoogleAuth({
+        credentials,
+        scopes: ["https://www.googleapis.com/auth/presentations.readonly"]
+    });
+}
 
 async function setSlideIds(presentationId: string) {
+    const auth = getAuth();
     const slidesApi = google.slides({ version: "v1", auth: (await auth.getClient()) as any });
     const response = await slidesApi.presentations.get({
         presentationId,
@@ -29,6 +43,7 @@ async function setSlideIds(presentationId: string) {
 }
 
 async function getSlideByObjectId(presentationId: string, objectId: string) {
+    const auth = getAuth();
     const slidesApi = google.slides({ version: "v1", auth: (await auth.getClient()) as any });
     try {
         const response = await slidesApi.presentations.pages.get({
