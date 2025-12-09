@@ -16,6 +16,8 @@
   --color-tertiary: var(--tertiary);
   --color-dark: var(--dark);
   --color-light: var(--light);
+  --color-red: var(--red);
+  --color-green: var(--green);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-henny-penny: var(--font-henny-penny);
